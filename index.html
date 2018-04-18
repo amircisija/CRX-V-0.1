@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>CryptoCompare</title>
+
+    <!-- Bootstrap -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+
+    <link rel="stylesheet" href="static/css/style.css">
+
+    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
+      <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->
+
+    <style>
+        .converter {
+            border-top: solid 1px lightgray;
+        }
+        
+        .converter input[type=text].reverse {
+            text-align: right;
+            font-size: 2em;
+            font-weight: 400;
+            border-radius: 0;
+            border: none;
+            border-bottom: solid 1px;
+            height: 1.8em;
+        }
+        
+        .converter input[type=text].reverse:focus {
+            box-shadow: none;
+        }
+        
+        .converter input[type=text].reverse:focus+.underline {
+            left: 0;
+        }
+        
+        .converter .c-toggle {
+            padding: 1.5em;
+            color: #0E85EC;
+            cursor: pointer;
+            border: none;
+            border-top-left-radius: 0;
+            border-bottom-left-radius: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        .converter .c-toggle:hover {
+            transition: all 0.5s ease;
+            color: #192C52;
+        }
+        
+        .converter .c-toggle:hover svg {
+            animation: toggle-spin 0.5s ease-in-out;
+        }
+        
+        .underline {
+            background-color: dodgerblue;
+            display: inline-block;
+            height: 3px;
+            position: absolute;
+            right: 0;
+            left: 100%;
+            bottom: 1.5em;
+            -webkit-transition: all 0.1s ease-in-out;
+            transition: all 0.1s ease-in-out;
+            z-index: 5;
+        }
+        
+        .price-holder {
+            padding: 5px 10px;
+            background-color: #4f6080;
+            margin: 10px 0;
+            width: fit-content;
+            border-radius: 0.2em;
+            color: white;
+            text-align: center;
+            font-size: 1.2em;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .input-group-addon {
+            background-color: transparent;
+            border: none;
+            font-weight: 500;
+            font-size: 2em;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .input-group-addon .sm {
+            font-size: 0.5em;
+            color: lightgray;
+        }
+        
+        .nav-link {
+            padding: 0.5rem 0.5rem;
+        }
+        
+        .nav-item {
+            cursor: pointer;
+            font-weight: 500;
+        }
+        
+        .nav-item:hover {
+            color: darkgray;
+        }
+        
+        .nav-item:hover a.active {
+            color: #0e85ec;
+        }
+        
+        .nav-item a.active {
+            color: #0e85ec;
+        }
+        
+        .timestamp {
+            color: #4f6080;
+        }
+        
+        .blurry {
+            text-shadow: 0 0 1em rgba(1, 1, 1, 0.5);
+            color: transparent;
+        }
+        
+        .label {
+            font-size: 0.5em;
+            padding: 4px;
+            border-radius: 0.2em;
+            font-weight: 900;
+        }
+        
+        .label.up {
+            background-color: #438a43;
+        }
+        
+        .label.down {
+            background-color: #cc3232;
+        }
+        
+        @keyframes btn-scale {
+            50% {
+                transform: scale(1.05);
+            }
+            100% {
+                transform: scale(1);
+            }
+        }
+        
+        @keyframes toggle-spin {
+            0% {
+                color: #0E85EC;
+                transform: rotate(0deg);
+            }
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+    </style>
+</head>
+
+<body class="container">
+    <h1>Module 1</h1>
+
+    <div class="row">
+        <div class="jumbotron col-xs-offset-2 col-xs-8">
+            <p>
+                Lorem ipsum dolor sit, amet consectetur adipisicing elit. Voluptates quae quam cumque ipsa, eius, consectetur illo voluptatum, cum sint esse eos non id quod enim eligendi dolorum accusamus earum ipsum!
+            </p>
+        </div>
+    </div>
+
+    <div id="Calc">
+        <div class="timestamp ml-2">
+            <span v-if="loading">
+            <i class="fa fa-spinner fa-spin mr-2"></i>
+          </span> Last updated: {{timestamp}}
+        </div>
+        <div class="container">
+            <div class="row">
+                <div class="col">
+                    <div class="price-holder">
+                        <span>{{displayRate}}</span>
+                        <span class="label ml-2" :class="bpi.change >= 0 ? 'up' : 'down'">
+                  {{change}}%
+                </span>
+                    </div>
+                </div>
+                <div class="col ml-auto my-auto">
+                    <ul class="nav justify-content-end">
+                        <li class="nav-item" v-for="(opt, i) in supportedCurrencies" :key="i">
+                            <a class="nav-link" v-bind:class="{'active' : currency === opt }" v-on:click="setCurrency(opt)">
+                    {{opt}}
+                  </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            <div class="row align-items-center converter">
+                <div class="col-sm-10 col-md-6 ml-auto">
+                    <div class="input-group">
+                        <div class="input-group">
+                            <input type="text" class="form-control reverse" placeholder="0.0" v-model="inputValue">
+                            <span class="underline"></span>
+                        </div>
+                        <span class="input-group-addon">
+                  <span>{{ inverted ?  trade : currency }}</span>
+                        <span class="sm" :class="{'blurry' : blurred }">{{conversion}}</span>
+                        </span>
+                    </div>
+                </div>
+                <button type="button" class="c-toggle btn btn-default col-sm-2" v-on:click="inverted = !inverted">
+              <i class="fas fa-sync fa-2x my-2"></i>
+            </button>
+            </div>
+        </div>
+    </div>
+
+    <div id="app">
+        <table class="table table-hover">
+            <thead>
+                <tr>
+                    <td>Mjesto</td>
+                    <td>Ime</td>
+                    <td>Cijena (EUR)</td>
+                    <td>1H</td>
+                    <td>1D</td>
+                    <td>1W</td>
+                </tr>
+            </thead>
+            <tbody>
+                <tr v-cloak v-for="coin in coins">
+                    <td>{{ coin.rank }}</td>
+                    <td>
+                        <img v-bind:src="getCoinImage(coin.symbol)"> {{ coin.name }}</td>
+                    <td>{{ coin.price_eur | currency('€') }}</td>
+                    <td v-bind:style="getColor(coin.percent_change_1h)">
+                        <span v-if="coin.percent_change_1h > 0">+</span>{{ coin.percent_change_1h }}%
+                    </td>
+                    <td v-bind:style="getColor(coin.percent_change_24h)">
+                        <span v-if="coin.percent_change_24h > 0">+</span>{{ coin.percent_change_24h }}%
+                    </td>
+                    <td v-bind:style="getColor(coin.percent_change_7d)">
+                        <span v-if="coin.percent_change_7d > 0">+</span>{{ coin.percent_change_7d }}%
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+    <script src="https://unpkg.com/vue"></script>
+    <script src="static/js/vue2-filters.min.js"></script>
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    <script src="static/js/moment-with-locales.min.js"></script>
+    <script src="https://use.fontawesome.com/releases/v5.0.1/js/all.js"></script>
+    <script src="static/js/app.js"></script>
+</body>
+
+</html>
